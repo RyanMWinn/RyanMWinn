@@ -1,0 +1,307 @@
+---
+title: "White Wine Quality Study"
+author: "Ryan Winn"
+date: "November 3, 2021"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+
+```
+
+This report will explore a dataset that contains quality data for approximately 5,000 different white wines.
+
+The first thing we will do, is set the environment for study by setting the working directory, bringing our file in for exploration, and testing the environment by checking for column headers.
+
+```{r}
+#set up the environment for use
+setwd("A:/Dev/R/White Wine Study")
+getwd()
+white_wine <- read.csv('wineQualityWhites.csv', sep = ',')
+names(white_wine)
+```
+Once we see that our data has loaded properly, we can load the packages needed for the study. The only library I loaded into this study is the ggplot2 library to build some of the plots. 
+
+```{r}
+#install all packages needed
+#install.packages('ggplot2', repos = "http://cran.us.r-project.org")
+library(ggplot2)
+```
+# Univariate Plots
+
+We first explore the shape of our quality values by examining the distribution curve shape.
+
+```{r}
+#plot a histogram for quality
+qplot(x = quality, data = white_wine) +
+  scale_x_continuous(breaks=1:10)
+```
+
+We can see the data is distributed normally, so we should look to use the middle values of the data, qualities 5-7, to show the trends in the data.
+
+We chart this data in a summary table to take a cursory glance at our dataset.
+
+```{r}
+#find basics statistic for the data
+summary(white_wine)
+```
+
+The first thought that jumps out to me is that almost every column has a rediculously high max number compared to the 3rd quartile value.  As the analysis progresses, I will need to cut some values off the graphs to show any actual trends in the data.
+
+Now we will plot each value field on a histogram to try and form an initial hypothesis as to what we believe is having the largest effect on the quality.
+
+```{r}
+#create histograms of the various fields below
+qplot(x = fixed.acidity, data = white_wine)
+```
+
+Fixed Acidity seems to be concentrated around the 6-9 unit range.
+
+```{r}
+qplot(x = volatile.acidity, data = white_wine)
+```
+
+Volatile Acidity is centered around the  0.3 mark.
+
+```{r}
+qplot(x = citric.acid, data = white_wine)
+```
+
+Citric Acid seems to fall on the lower end mostly under 0.5.
+
+```{r}
+qplot(x = residual.sugar, data = white_wine)
+```
+
+Residual Sugar also seems to be a low value around 5.
+
+```{r}
+qplot(x = chlorides, data = white_wine)
+```
+
+Chlorides have the lowest unit value of all, most wines fall lower than 0.1.
+
+```{r}
+qplot(x = free.sulfur.dioxide, data = white_wine)
+```
+
+Free Sulfur Dioxide falls mostly below 50.
+
+```{r}
+qplot(x = total.sulfur.dioxide, data = white_wine)
+```
+
+Total Sulfer Dioxide has a wider range than the free sulfer dioxide, between 100 and 200.
+
+```{r}
+qplot(x = density, data = white_wine)
+```
+
+Density falls mostly below 1, but is a normal distribution it seems.
+
+```{r}
+qplot(x = pH, data = white_wine)
+```
+
+pH falls mostly between 3.0 and 3.6
+
+```{r}
+qplot(x = sulphates, data = white_wine)
+```
+
+Sulphates have an unusual shape, but exist mostly between 0.3 and 0.6.
+
+```{r}
+qplot(x = alcohol, data = white_wine)
+```
+
+Alcohol has the widest range of all the features, with many peaks and valleys in the data.
+
+
+Based on these initial histograms run, I am starting to believe the biggest factors in determining quality are going to be citric.acid, pH, sulphates, and alcohol.
+
+# Univariate Analysis
+
+### What is the structure of your dataset?
+
+There are 4,898 wines that have 12 features (fixed acidity, volatile acidity, citric acid, residual sugar, chlorides, free sulfer dioxide, total sulfer dioxide, density, pH, sulfates, alcohol, and qualtity).
+
+Initial Observations:
+  Most wines are of a quality of 6, with the lowest being 3 and the highest being 9.
+  Almost all histogram curves are normalized except the alcohol curve.
+
+### What is/are the main features of your dataset?
+
+The main feature of the dataset is quality.  I would like to determine what combination of features will determine the quality of a wine the most.
+
+### What features do you think will help support your investigation?
+
+I think the alcohol will play the largest role in the quality of the wine, but I think that citric acid, pH, and sulphates will play the largest supporting roles.
+
+### Did you create any new variables from the existing variables?
+
+I did not create any new variables, I did not see the need or the vision to combine variables in a meaningful way.
+
+### Did you perform any operations to tidy, adjust, or change the form of the data?
+
+No, but I may need to transform the data to dive deeper into some of the features.
+
+# Bivariate Plots
+
+```{r}
+#create various scatterplots measuring a feature vs quality
+qplot(x = citric.acid, y = quality, data = white_wine) + geom_jitter() + xlim(NA,1.0)
+```
+
+There seems to be a weak coorelation here if there is any at all.  We can probably eliminate this as a top feature.
+
+```{r}
+qplot(x = pH, y = quality, data = white_wine) + geom_jitter()
+```
+
+Once again, there does not appear to be a strong coorelation, meaning we will most likely remove pH as a top feature.
+
+```{r}
+qplot(x = sulphates, y = quality, data = white_wine) + geom_jitter()
+```
+
+Now that we chart these features together, I can most likely eliminate sulphates as a top feature.
+
+```{r}
+qplot(x = alcohol, y = quality, data = white_wine) + geom_jitter()
+```
+
+This shows a strong coorelation with the quality, meaning we should keep this as a top feature.
+
+Now that we have checked our initial ideas, we should look at the other features since 4/5 hypotheses were incorrect.
+
+```{r}
+qplot(x = fixed.acidity, y = quality, data = white_wine) + geom_jitter()
+```
+
+```{r}
+qplot(x = volatile.acidity, y = quality, data = white_wine) + geom_jitter()
+```
+
+We can see a negative trend with the acidity features, and should keep this in mind going forward.
+
+```{r}
+qplot(x = residual.sugar, y = quality, data = white_wine) +
+  xlim(NA,25) + geom_jitter()
+```
+
+```{r}
+qplot(x = chlorides, y = quality, data = white_wine) + geom_jitter()
+```
+
+```{r}
+qplot(x = free.sulfur.dioxide, y = quality, data = white_wine) +
+  xlim(NA,150) + geom_jitter()
+```
+
+```{r}
+qplot(x = total.sulfur.dioxide, y = quality, data = white_wine) + geom_jitter()
+```
+
+These four plots really don't show any coorelation alone, and probably are not the top contributors.
+
+```{r}
+qplot(x = density, y = quality, data = white_wine) + xlim(NA,1.01) + geom_jitter()
+```
+
+Density is interesting, because there is a definite trend towards lower density wines and higher quality.  This feature should be investigated more.
+
+# Bivariate Analysis
+
+Talk about some of the relationships that you observed.
+
+There are very few individual factors that go into determining the quality of the wine.  I orginally thought that citric acid, pH, sulphates, and alochol might have the strongest indicators of quality.  Happily, I can say that alcohol seems to have the strongest individual tie to quality.  We can see from the scatterplot that as alcohol content increases, the genral quality of the wine also increases.  Also, as the acidity levels of the wine increase, the quality of the wine decreases as well.  Finally, density seems to have a relationship with quality.
+
+Overall there seems to be a lack of individual factors that play into the overall quality.  What this means going forward is that the combination of features used the play into a wine's quality will need to be a combination of all the features that we have seen so far.  I do believe that the highest quality of wine will contian a high alcohol content and low acidity levels, and the rest of the quality will be a combination of citric acid, sulphates and chlorides.
+
+# Multivariate Plots
+
+```{r}
+#create a scatterplot comparing a feature vs alcohol, grouped by quality
+qplot(x = alcohol, y = density, color = as.factor(quality), data = white_wine) + coord_cartesian(ylim = c(0.985, 1.005))
+
+##create a scatterplot comparing a feature vs alcohol, grouped by quality in seperate plots
+qplot(x = alcohol, y = density, data = white_wine, color = as.factor(quality), alpha = I(1/4)) + 
+    coord_cartesian(ylim = c(0.985, 1.005)) + facet_wrap(~quality)
+```
+
+These two plots show a clear trend where as alcohol percentage increase, and density decreases the quality of the wine increases.
+
+```{r}
+qplot(x = alcohol, y = fixed.acidity, color = as.factor(quality), data = white_wine) + coord_cartesian(ylim = c(NA, 11))
+
+qplot(x = alcohol, y = fixed.acidity, color = as.factor(quality), data = white_wine, alpha = I(1/4)) + coord_cartesian(ylim = c(NA, 11)) + facet_wrap(~quality)
+```
+
+```{r}
+qplot(x = alcohol, y = volatile.acidity, color = as.factor(quality), data = white_wine) + coord_cartesian(ylim = c(NA, .9))
+
+qplot(x = alcohol, y = volatile.acidity, color = as.factor(quality), data = white_wine, alpha = I(1/4)) + coord_cartesian(ylim = c(NA, .9)) + facet_wrap(~quality)
+```
+
+```{r}
+qplot(x = alcohol, y = chlorides, color = as.factor(quality), data = white_wine) + coord_cartesian(ylim = c(NA, .1))
+
+qplot(x = alcohol, y = chlorides, color = as.factor(quality), data = white_wine, alpha = I(1/4)) + coord_cartesian(ylim = c(NA, .1)) + facet_wrap(~quality)
+```
+
+These other sets of plots really highlight that there  is no stronger connection than alcohol and density when it comes to the quality of the wine.
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the investigation.
+
+I think the most surprising relationship that I observed during this investigation was between alcohol and density.  This was surprising because this combination of features showed the greatest relationship to the quality.  Basically, the higher the alochol content and the lower the density of the wine, the better the quality of the wine.  This surprised me the most becuase it basically showed that the quality of the wine was about how drunk you would get from drinking the wine.  There were no other features observed that had as clear of a relationship as these two did.
+
+# Final Plots and Summary
+
+### Plot One
+
+```{r}
+#histogram of quality refined
+qplot(x = quality, data = white_wine, geom = 'bar', fill = quality) +
+  scale_x_continuous(breaks=1:10) +
+  ggtitle("White Wine Histogram by Quality") + 
+  xlab("Quality of Wine (User Rating)") +
+  ylab("Count of Wine")
+```
+
+The distribution of the quality of wine is a normal distribution.  This shows that the largest range of values will exist between 5-7 and will show us the most about the trends in the data.
+
+### Plot Two
+
+```{r}
+#scatterplot of alcohol vs quality refined
+qplot(x = alcohol, y = quality, data = white_wine) +
+  geom_jitter() +
+  ggtitle("Alcohol vs Quality") +
+  xlab("Alcohol by Percent (% by volume)") +
+  ylab("Quality (User Rating)")
+```
+
+This plot shows us that as the percentage of the alcohol increases, the likelyhood the wine has a higher quality also increases.
+
+### Plot Three
+
+```{r}
+#scatterplot of alcohol vs density grouped by quality as seperate plots refined
+qplot(x = alcohol, y = density, data = white_wine, color = as.factor(quality), alpha = I(1/4)) + 
+    coord_cartesian(ylim = c(0.985, 1.005)) + 
+    facet_wrap(~quality) +
+    ggtitle("Alcohol vs Density by Quality") +
+    xlab("Alcohol by Percent (% by volume)") +
+    ylab("Density (g / cm^3)") +
+    scale_color_discrete(name = "Quality")
+```
+
+This plot shows us very clearly that using our two most important features, if we want to create a high quality wine, we should look to increase the alcoholic content of the wine, and lower the density of the wine.
+
+# Reflection
+
+This project taught me a lot about how to use R to analyze a dataset and discover some of the hidden secrets of the data.  I really struggled on the last section, the multivariate plots.  I have never had to create a multivariate plot before this project, so I didn't have any kind of experience in what this should even look like.  I had to perform some outside research on how to group the data together, and how to demonstrate the concept I wanted to highlight.  I also struggled a lot with trying to create boxplots for this dataset.  I include this as a struggle because I did not successfully create a boxplot of this data.  Any time I tried to create a boxplot, the plot never came out looking the way that I envision it would, so this is clearly an area that I can grow in.  I did experience a lot of success in the bivariate plot section.  Creating these plots gave me little to no trouble, and really helped tell the story this data was trying to tell.  One way I think that this analysis could be improved is to do some type of machine learning, where we train a model to look at these wines, and give us a ranking of importance somehow.  We could then use that ranking to combine several of the features of the wine and see just how each feature really changes the quality of the wine.
