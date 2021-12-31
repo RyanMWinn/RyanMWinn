@@ -1,0 +1,9 @@
+This project was completed as part of the WGU Data Analytics course.  The purpose of this project was to learn how to pull information from an open
+source of data and then clean and convert the data into an excel spreadsheet.  The data was pulled from Open Street Maps, and I took the data from
+this area where I live and cleaned the data to ensure that all of the street names matched and the county name was just the county and not the 
+county and the state.  The data was then exported into an excel spreadsheet, and then upload into an Access database that I created.  The data was
+then queried to probe the data for some simple information.
+
+Items to update:
+1. Add the raw data to the folder - the raw data was too large to upload
+2. Add the database to the folder - the database was too large to upload
