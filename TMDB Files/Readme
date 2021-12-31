@@ -1,0 +1,4 @@
+This project focused on using Jupyter Notebook to create a basic project using the Numpy and Pandas modules in python.
+The project is fairly straight forward, but this involves importing a dataset from an Excel spreadsheet into the notebook,
+and then perform some basic statsitical analysis on the dataset.  In this case, I looked at how the cost of creating a movie
+effected the revenue of the movie adjusted for inflation by year.
